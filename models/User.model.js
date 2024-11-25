@@ -1,29 +1,33 @@
 import { DataTypes, NOW  } from "sequelize";
-import { connection } from "../../config/db.js";
+import { connection } from "../config/db.js";
 
-export const user= connection.define(
+export const User = connection.define(
   "users",
   {
-    F_name: {
+    user_id :{
+      type: DataTypes.INTEGER(10),
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    full_name :{
       type: DataTypes.STRING(30),
+      allowNull : false
     },
-    L_name: {
+    email: {
       type: DataTypes.STRING(30),
+      allowNull :false,
+      unique : true
     },
-    Email: {
-      type: DataTypes.STRING(30),
-    },
-    Mobile_No: {
-      type: DataTypes.STRING(15),
-    },
-    userName:{
+    user_name:{
       type:DataTypes.STRING(15),
+      allowNull: false,
+      unique: true
     },
-    Password: {
+    password: {
       type: DataTypes.STRING(15),
     },
-    Status: {
-      type: DataTypes.STRING(2),
+    profile_picture :{
+      type: DataTypes.STRING(30),
     },
   },
   {
