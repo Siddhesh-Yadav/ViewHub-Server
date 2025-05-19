@@ -16,7 +16,21 @@ export const FavouriteVideo = connection.define(
     user_id: {
         type: DataTypes.INTEGER(10),
         allowNull : false
-    }
+    },
+    video_title: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      defaultValue: NOW,
+      allowNull: false,
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      defaultValue: NOW,
+      allowNull: false,
+    },
   },
   {
     // Freeze Table Name

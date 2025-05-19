@@ -3,12 +3,12 @@ import dotenv from "dotenv";
 dotenv.config();
 
 export const connection = new Sequelize(
-  process.env.Workspace_DB_RDS_NAME,
-  process.env.Workspace_DB_RDS_USER,
-  process.env.Workspace_DB_RDS_PASS,
+  process.env.DB_NAME,
+  process.env.DB_USER,
+  process.env.DB_PASSWORD,
   {
-    host: process.env.Workspace_DB_RDS_HOST,
-    dialect: process.env.Workspace_DB_DIALECT,
+    host: process.env.DB_HOST,
+    dialect: process.env.DB_DIALECT,
     dialectOptions: {
       timezone: "+05:30",
     },

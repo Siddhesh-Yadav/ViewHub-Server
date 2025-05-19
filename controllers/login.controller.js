@@ -43,9 +43,10 @@ export const login = async (req, res) => {
         message: "Please try to login with correct credentials!",
       });
     }
-
+    
+    const {full_name,email :Email,user_name,profile_picture, user_id} = user
     // Generate JWT token
-    const PAYLOAD = { id, Party_Code, user_type, role, Access_Code };
+    const PAYLOAD = { user_id, user_name };
     let JWT = generateJWT(PAYLOAD);
 
     // Return successful response with user info, menus, and logo
@@ -55,7 +56,7 @@ export const login = async (req, res) => {
       data: {
         JWT,
         full_name,
-        email,
+        email : Email,
         user_name,
         profile_picture,
       },

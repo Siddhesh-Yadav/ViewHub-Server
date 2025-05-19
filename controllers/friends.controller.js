@@ -1,39 +1,40 @@
+import { Op } from "sequelize";
 import { models } from "../models/index.js";
 const { Friends, User, Notification } = models;
 
 export const getFriends = async (req, res) => {
   try {
     let { user_id } = req.user;
-    const sentRequests = await Friends.findAll({
+    const allFriends = await Friends.findAll({
+      raw: true,
       where: {
-        sender_id: user_id,
-        request_status: "accepted",
+        [Op.or] :[{sender_id: user_id}, {recipent_id: user_id}],
+        request_status: ["accepted", "pending"],
       },
     });
-
-    // Find all friend requests where the user is the recipient and the request status is 'accepted'
-    const receivedRequests = await Friends.findAll({
-      where: {
-        recipent_id: user_id,
-        request_status: "accepted",
-      },
-    });
+    console.log("All Friends:", allFriends);
 
     // Extract the user IDs of the senders and recipients from the friend requests
-    const sentUserIds = sentRequests.map((request) => request.recipient_id);
-    const receivedUserIds = receivedRequests.map(
-      (request) => request.sender_id
-    );
-
-    // Combine the user IDs from both lists to get the IDs of all friends
-    const friendUserIds = [...sentUserIds, ...receivedUserIds];
-
+    const UserIds = allFriends.map((user) => {
+      return user.sender_id === user_id ? user.recipent_id : user.sender_id;
+    });
+    
     // Retrieve the user details of the friends
-    const friends = await User.findAll({
-      attributes: ["full_name", "user_name", "profile_picture"],
+    const friendsData = await User.findAll({
+      raw:true,
+      attributes: ["user_id","full_name", "user_name", "profile_picture"],
       where: {
-        user_id: friendUserIds,
+        user_id: UserIds,
       },
+    });
+
+    const friends = allFriends.map((user) => {
+      const friendId = user.sender_id === user_id ? user.recipent_id : user.sender_id;
+      const friendDetails = friendsData.find((friend) => friend.user_id === friendId);
+      return {
+        ...friendDetails,
+        ...user
+      };
     });
 
     return res.status(200).json({
@@ -52,14 +53,11 @@ export const getFriends = async (req, res) => {
 
 export const friendRequestApproval = async (req, res) => {
   try {
-    const { approval, sender_user_name,notification_id } = req.body;
+    const { notification_id, approval, associated_user_id} = req. body;
     const { user_id } = req.user;
-    const sender = await User.findOne({
-      where: { user_name: sender_user_name },
-    });
     const updateRequestStatus = await Friends.update(
       { request_status: approval ? "accepted" : "rejected" },
-      { where: { recipent_id: user_id, sender_id: sender.user_id,request_status : "pending" } }
+      { where: { recipent_id : user_id, sender_id : associated_user_id, request_status : "pending" } }
     );
     const updateNotificationStatus = await Notification.update(
       {notification_status: "read"},
@@ -94,17 +92,18 @@ export const sendFriendRequest = async ( req, res ) => {
         message: `No user found with user name ${user_name}`,
       });
     }
+    const createNotification = await Notification.create({
+      recipent_id : userFound.user_id,
+      notification_type : "friend_request",
+      associated_video_id : null,
+      associated_user_id : user_id,
+      notification_status : "unread",
+    });
     const addFriend = await Friends.create({
       sender_id : user_id,
       recipent_id : userFound.user_id,
-      request_status:"pending"
-    });
-    const createNotification = await Notification.create({
-      recipent_id:userFound.user_id,
-      notification_type:"friend_request",
-      associated_video_id:null,
-      associated_user_id: user_id,
-      notification_status:"unread"
+      request_status:"pending",
+      notification_id : createNotification.notification_id,
     });
     return res.status(200).json({
       success: true,

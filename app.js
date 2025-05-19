@@ -50,7 +50,7 @@ app.use("/", routes);
 app.use(errorLogger);
 
 // Define the PORT and ENVIRONMENT variables for the server
-const PORT = process.env.Workspace_DB_PORT; // Port number from environment variables
+const PORT = process.env.PORT; // Port number from environment variables
 
 // Set up Socket.IO for one-to-one chat
 io.on("connection", (socket) => {

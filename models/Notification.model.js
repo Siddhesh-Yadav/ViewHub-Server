@@ -7,7 +7,7 @@ export const Notification = connection.define(
     notification_id :{
       type: DataTypes.INTEGER(10),
       primaryKey: true,
-      autoIncrement: true,
+      autoIncrement: true
     },
     recipent_id: {
         type: DataTypes.INTEGER(10),
@@ -18,15 +18,15 @@ export const Notification = connection.define(
         values: ['friend_request', 'video_invite'],
     },
     associated_video_id :{
-      type: DataTypes.STRING(30),
+      type: DataTypes.STRING(30)
     },
     associated_user_id: {
-        type: DataTypes.INTEGER(10),
+        type: DataTypes.INTEGER(10)
     },
     notification_status:{
         type: DataTypes.ENUM,
-        values: ['read', 'unread'],
-    },
+        values: ['read', 'unread']
+    }
   },
   {
     // Freeze Table Name

@@ -26,3 +26,23 @@ export const getNotification = async ( req, res ) => {
       .json({ success: false, message: "Internal server error" });
   }
 };
+
+export const updateNotification = async (req, res) => {
+  try {
+    const { notification_id } = req.body;
+    const notification = await Notification.update(
+      { notification_status: "read" },
+      { where: { notification_id } }
+    );
+    
+    return res.status(200).json({
+      success: true,
+      message: "Notification updated successfully",
+    });
+  } catch (error) {
+    console.error("Error updating notification", error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
+  }
+};

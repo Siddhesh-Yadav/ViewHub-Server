@@ -21,6 +21,14 @@ export const Friends = connection.define(
         type: DataTypes.ENUM,
         values: ['accepted', 'pending', 'rejected'],
     },
+    notification_id: {
+        type: DataTypes.INTEGER(10),
+        allowNull : true,
+        references: {
+          model: 'notification',
+          key: 'notification_id'
+        }
+    },
   },
   {
     // Freeze Table Name

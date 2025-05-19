@@ -1,29 +1,49 @@
 import { models } from "../models/index.js";
+import { Op } from "sequelize";
 const { User } = models;
 
 export const findUser = async (req, res) => {
   try {
-    const { user_name } = req.body;
-    const userFound = await User.findOne({
-      attributes: ["full_name", "user_name", "profile_picture"],
-      where: {
-        user_name: user_name,
-      },
-    });
-    if (!userFound) {
-      return res.status(400).json({
-        success: false,
-        message: `No user found with user name ${user_name}`,
+    const { search, user_ids } = req.query;
+    const { user_id: currentUserId } = req.user;
+
+    // If user_ids array is provided, fetch those specific users
+    if (user_ids) {
+      const userIdArray = JSON.parse(user_ids);
+      const users = await User.findAll({
+        attributes: ["user_id", "full_name", "user_name", "profile_picture"],
+        where: {
+          user_id: userIdArray
+        }
+      });
+      
+      return res.status(200).json({
+        success: true,
+        message: `${users.length} users found`,
+        data: users,
       });
     }
+
+    // Otherwise handle search query
+    const users = await User.findAll({
+      attributes: ["user_id", "full_name", "user_name", "profile_picture"],
+      where: {
+        [Op.or]: [
+          { full_name: { [Op.like]: `%${search}%` } },
+          { user_name: { [Op.like]: `%${search}%` } },
+          { email: { [Op.like]: `%${search}%` } },
+        ],
+      },
+      limit: 10, // Limit results for better performance
+    });
+
     return res.status(200).json({
       success: true,
-      message: `user found !`,
-      data: userFound,
+      message: `${users.length} users found`,
+      data: users,
     });
   } catch (error) {
     console.error("Error while fetching user details:", error);
-    // Send 500 status for other unexpected errors
     return res
       .status(500)
       .json({ success: false, message: "Internal server error" });

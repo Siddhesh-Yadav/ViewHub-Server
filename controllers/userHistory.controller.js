@@ -9,10 +9,7 @@ export const addUserHistory = async (req, res) => {
       where: { video_id, user_id },
     });
 
-    if (historyRowExists) {
-      // Update existing row, which will trigger `updatedAt`
-      await historyRowExists.update({ updatedAt: new Date() });
-    } else {
+    if (!historyRowExists) {
       // Create a new row
       await UserHistory.create({
         video_id,

@@ -27,7 +27,7 @@ export const User = connection.define(
       type: DataTypes.STRING(15),
     },
     profile_picture :{
-      type: DataTypes.STRING(30),
+      type: DataTypes.STRING(),
     },
   },
   {
