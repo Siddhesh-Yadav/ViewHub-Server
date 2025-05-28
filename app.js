@@ -52,23 +52,40 @@ app.use(errorLogger);
 // Define the PORT and ENVIRONMENT variables for the server
 const PORT = process.env.PORT; // Port number from environment variables
 
-// Set up Socket.IO for one-to-one chat
+// Set up Socket.IO for video sync and chat
 io.on("connection", (socket) => {
   console.log(`User connected: ${socket.id}`);
 
-  // Event: Join a room
   socket.on("join-room", (roomId) => {
     socket.join(roomId);
     console.log(`User ${socket.id} joined room: ${roomId}`);
   });
 
-  // Event: Send message
   socket.on("send-message", ({ roomId, message }) => {
-    console.log(`Message in room ${roomId}:`, message);
-    io.to(roomId).emit("receive-message", message); // Emit message to users in the room
+    console.log(`User ${socket.id} sent message ${message} in room: ${roomId}`);
+    io.to(roomId).emit("receive-message", message);
   });
 
-  // Event: Disconnect
+  socket.on("video-action", ({ roomId, action, timestamp }) => {
+    console.log(`User ${socket.id} performed action: ${action} at ${timestamp} in room: ${roomId}`);
+    // Broadcast to all other users in the room
+    io.to(roomId).emit("video-action", { action, timestamp });
+  });
+
+  socket.on("leave-room", (roomId) => {
+    socket.leave(roomId);
+    console.log(`User ${socket.id} left room: ${roomId}`);
+  });
+
+  socket.on("disconnecting", () => {
+    const rooms = [...socket.rooms];
+    rooms.forEach((room) => {
+      if (room !== socket.id) {
+        io.to(room).emit("user-disconnected", socket.id);
+      }
+    });
+  });
+
   socket.on("disconnect", () => {
     console.log(`User disconnected: ${socket.id}`);
   });

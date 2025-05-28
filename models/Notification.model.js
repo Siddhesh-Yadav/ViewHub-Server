@@ -17,6 +17,15 @@ export const Notification = connection.define(
         type: DataTypes.ENUM,
         values: ['friend_request', 'video_invite'],
     },
+    invite_status: {
+        type: DataTypes.ENUM,
+        values: ['pending', 'accepted', 'rejected'],
+        defaultValue: 'pending'
+    },
+    room_id: {
+        type: DataTypes.STRING(100),
+        allowNull: true
+    },
     associated_video_id :{
       type: DataTypes.STRING(30)
     },
