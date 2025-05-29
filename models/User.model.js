@@ -24,7 +24,7 @@ export const User = connection.define(
       unique: true
     },
     password: {
-      type: DataTypes.STRING(15),
+      type: DataTypes.STRING(256),
     },
     profile_picture :{
       type: DataTypes.STRING(),

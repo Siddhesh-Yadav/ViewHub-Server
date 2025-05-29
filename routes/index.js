@@ -8,7 +8,7 @@ import { signup } from "../controllers/signup.controller.js";
 import { addFavouriteVideo,isFavouriteVideo,favouriteVideos } from "../controllers/favouriteVideo.controller.js";
 import { findUser } from "../controllers/findUser.controller.js";
 import { getFriends, friendRequestApproval, sendFriendRequest } from "../controllers/friends.controller.js";
-import { getNotification, updateNotification } from "../controllers/notifcation.controller.js";
+import { getNotification, updateNotification } from "../controllers/notification.controller.js";
 import { addUserHistory, getUserHistory } from "../controllers/userHistory.controller.js";
 import { getVideos, sendVideoInvite } from "../controllers/video.controller.js";
 

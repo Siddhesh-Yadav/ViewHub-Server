@@ -10,8 +10,8 @@ const flag = false; // !! KEEP IT FALSE I REPEAT KEEP IT FALSE
 // Export all imported models as a single object
 export const models = {
   FavouriteVideo,
-  Friends,
   Notification,
+  Friends,
   User,
   UserHistory,
 };

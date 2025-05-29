@@ -4,6 +4,7 @@ const { User } = models;
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import bcrypt from "bcrypt";
 dotenv.config();
 const JWT_SECRET = process.env.JWT_SECRET;
 const SECRET_KEY = process.env.SECRET_KEY;
@@ -31,9 +32,10 @@ const generateJWT = (payload) => {
 export const login = async (req, res) => {
   try {
     let { email, password } = req.body;
+
     let user = await User.findOne({
       raw: true,
-      where: { email, password },
+      where: { email },
     });
 
     // If user not found, return error
@@ -43,8 +45,24 @@ export const login = async (req, res) => {
         message: "Please try to login with correct credentials!",
       });
     }
-    
-    const {full_name,email :Email,user_name,profile_picture, user_id} = user
+
+    // Verify password using bcrypt compare
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordValid) {
+      return res.status(400).json({
+        success: false,
+        message: "Please try to login with correct credentials!",
+      });
+    }
+
+    const {
+      full_name,
+      email: Email,
+      user_name,
+      profile_picture,
+      user_id,
+    } = user;
     // Generate JWT token
     const PAYLOAD = { user_id, user_name };
     let JWT = generateJWT(PAYLOAD);
@@ -56,7 +74,7 @@ export const login = async (req, res) => {
       data: {
         JWT,
         full_name,
-        email : Email,
+        email: Email,
         user_name,
         profile_picture,
       },
